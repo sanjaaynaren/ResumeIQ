@@ -91,7 +91,7 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <HeroSection />
       
-      <div className="max-w-7xl mx-auto px-4 py-16 space-y-12">
+      <div className="max-w-7xl mx-auto px-4 py-16 space-y-12" id="upload-section">
         {!analysisData ? (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="order-2 lg:order-1">

@@ -2,6 +2,12 @@ import { Button } from "@/components/ui/button";
 import { Brain, FileCheck, TrendingUp, Users } from "lucide-react";
 
 export const HeroSection = () => {
+  const scrollToUpload = () => {
+    const uploadSection = document.getElementById('upload-section');
+    if (uploadSection) {
+      uploadSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
   return (
     <section className="relative py-20 px-4 text-center bg-gradient-hero overflow-hidden">
       {/* Background decoration */}
@@ -27,10 +33,10 @@ export const HeroSection = () => {
         </div>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16 animate-slide-up" style={{ animationDelay: '0.2s' }}>
-          <Button variant="hero" size="lg" className="text-lg">
+          <Button variant="hero" size="lg" className="text-lg" onClick={scrollToUpload}>
             Start Screening Resumes
           </Button>
-          <Button variant="outline-hero" size="lg" className="text-lg">
+          <Button variant="outline-hero" size="lg" className="text-lg" onClick={scrollToUpload}>
             View Demo
           </Button>
         </div>
