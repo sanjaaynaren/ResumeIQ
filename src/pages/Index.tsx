@@ -32,6 +32,60 @@ const Index = () => {
     });
   };
 
+  const isResumeFile = (fileName: string, fileContent?: string): boolean => {
+    // Check file extension
+    const resumeExtensions = ['.pdf', '.doc', '.docx', '.txt'];
+    const hasResumeExtension = resumeExtensions.some(ext => 
+      fileName.toLowerCase().endsWith(ext)
+    );
+    
+    // Check if filename contains resume-related keywords
+    const resumeKeywords = ['resume', 'cv', 'curriculum'];
+    const hasResumeKeyword = resumeKeywords.some(keyword => 
+      fileName.toLowerCase().includes(keyword)
+    );
+    
+    // Basic content check (if available)
+    if (fileContent) {
+      const contentKeywords = [
+        'experience', 'education', 'skills', 'work', 'employment', 
+        'university', 'college', 'degree', 'certification', 'project',
+        'developer', 'engineer', 'manager', 'analyst', 'specialist'
+      ];
+      const contentMatches = contentKeywords.filter(keyword => 
+        fileContent.toLowerCase().includes(keyword)
+      ).length;
+      
+      // If file has resume-like content (at least 3 keywords)
+      if (contentMatches >= 3) return true;
+    }
+    
+    // If file has resume extension or keyword in name, likely a resume
+    return hasResumeExtension || hasResumeKeyword;
+  };
+
+  const validateResumeFile = async (file: File): Promise<boolean> => {
+    const fileName = file.name;
+    
+    // First check filename
+    if (isResumeFile(fileName)) {
+      return true;
+    }
+    
+    // For text files, check content
+    if (file.type === 'text/plain') {
+      try {
+        const content = await file.text();
+        return isResumeFile(fileName, content);
+      } catch (error) {
+        console.log('Error reading file content:', error);
+      }
+    }
+    
+    // For other file types, rely on filename check
+    return isResumeFile(fileName);
+  };
+
   const generateDynamicAnalysis = (fileName: string, jobDesc: string): AnalysisData => {
     // Generate variation based on file name and job description
     const fileHash = fileName.split('').reduce((a, b) => a + b.charCodeAt(0), 0);
@@ -102,6 +156,19 @@ const Index = () => {
 
     setJobDescription(description);
     setIsAnalyzing(true);
+
+    // Validate if the uploaded file is a resume
+    const isValidResume = await validateResumeFile(uploadedFile);
+    
+    if (!isValidResume) {
+      setIsAnalyzing(false);
+      toast({
+        title: "Invalid file type",
+        description: "Please upload a job resume",
+        variant: "destructive",
+      });
+      return;
+    }
 
     // Simulate AI analysis with dynamic results
     setTimeout(() => {
