@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { HeroSection } from '@/components/HeroSection';
 import { FileUpload } from '@/components/FileUpload';
 import { JobDescriptionInput } from '@/components/JobDescriptionInput';
 import { AnalysisResults } from '@/components/AnalysisResults';
+import { ApiKeyInput } from '@/components/ApiKeyInput';
 import { useToast } from '@/hooks/use-toast';
+import { analyzeResumeWithAI, extractTextFromFile } from '@/lib/openai';
 
 interface AnalysisData {
   fitPercentage: number;
@@ -21,7 +23,15 @@ const Index = () => {
   const [jobDescription, setJobDescription] = useState<string>('');
   const [analysisData, setAnalysisData] = useState<AnalysisData | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [apiKey, setApiKey] = useState<string>('');
   const { toast } = useToast();
+
+  useEffect(() => {
+    const savedApiKey = localStorage.getItem('openai_api_key');
+    if (savedApiKey) {
+      setApiKey(savedApiKey);
+    }
+  }, []);
 
   const handleFileUpload = (file: File) => {
     setUploadedFile(file);
@@ -154,34 +164,58 @@ const Index = () => {
       return;
     }
 
-    setJobDescription(description);
-    setIsAnalyzing(true);
-
-    // Validate if the uploaded file is a resume
-    const isValidResume = await validateResumeFile(uploadedFile);
-    
-    if (!isValidResume) {
-      setIsAnalyzing(false);
+    if (!apiKey) {
       toast({
-        title: "Invalid file type",
-        description: "Please upload a job resume",
+        title: "API key required",
+        description: "Please configure your OpenAI API key first",
         variant: "destructive",
       });
       return;
     }
 
-    // Simulate AI analysis with dynamic results
-    setTimeout(() => {
-      const analysisData = generateDynamicAnalysis(uploadedFile.name, description);
+    setJobDescription(description);
+    setIsAnalyzing(true);
+
+    try {
+      // Validate if the uploaded file is a resume
+      const isValidResume = await validateResumeFile(uploadedFile);
       
-      setAnalysisData(analysisData);
+      if (!isValidResume) {
+        setIsAnalyzing(false);
+        toast({
+          title: "Invalid file type",
+          description: "Please upload a job resume",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Extract text from the uploaded file
+      const resumeText = await extractTextFromFile(uploadedFile);
+      
+      // Use OpenAI to analyze the resume
+      const analysisResult = await analyzeResumeWithAI(
+        resumeText,
+        description,
+        uploadedFile.name,
+        apiKey
+      );
+      
+      setAnalysisData(analysisResult);
       setIsAnalyzing(false);
       
       toast({
         title: "Analysis complete",
-        description: `Resume analyzed with ${analysisData.fitPercentage}% fit score`,
+        description: `Resume analyzed with ${analysisResult.fitPercentage}% fit score`,
       });
-    }, 3000);
+    } catch (error) {
+      setIsAnalyzing(false);
+      toast({
+        title: "Analysis failed",
+        description: error instanceof Error ? error.message : "An error occurred during analysis",
+        variant: "destructive",
+      });
+    }
   };
 
   const resetAnalysis = () => {
@@ -196,18 +230,24 @@ const Index = () => {
       <HeroSection />
       
       <div className="max-w-7xl mx-auto px-4 py-16 space-y-12" id="upload-section">
+        {!apiKey && (
+          <ApiKeyInput onApiKeySet={setApiKey} hasApiKey={!!apiKey} />
+        )}
+        
         {!analysisData ? (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="order-2 lg:order-1">
               <JobDescriptionInput
                 onSubmit={handleJobDescriptionSubmit}
                 isLoading={isAnalyzing}
+                disabled={!apiKey}
               />
             </div>
             <div className="order-1 lg:order-2">
               <FileUpload
                 onFileUpload={handleFileUpload}
                 isLoading={isAnalyzing}
+                disabled={!apiKey}
               />
             </div>
           </div>

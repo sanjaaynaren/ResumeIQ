@@ -9,10 +9,11 @@ import { cn } from "@/lib/utils";
 interface FileUploadProps {
   onFileUpload: (file: File) => void;
   isLoading?: boolean;
+  disabled?: boolean;
   accept?: Record<string, string[]>;
 }
 
-export const FileUpload = ({ onFileUpload, isLoading = false, accept }: FileUploadProps) => {
+export const FileUpload = ({ onFileUpload, isLoading = false, disabled = false, accept }: FileUploadProps) => {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
 
@@ -44,7 +45,8 @@ export const FileUpload = ({ onFileUpload, isLoading = false, accept }: FileUplo
       'text/plain': ['.txt']
     },
     maxFiles: 1,
-    multiple: false
+    multiple: false,
+    disabled: disabled || isLoading
   });
 
   const removeFile = () => {

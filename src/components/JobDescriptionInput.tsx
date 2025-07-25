@@ -8,9 +8,10 @@ import { Briefcase, Sparkles } from "lucide-react";
 interface JobDescriptionInputProps {
   onSubmit: (jobDescription: string) => void;
   isLoading?: boolean;
+  disabled?: boolean;
 }
 
-export const JobDescriptionInput = ({ onSubmit, isLoading = false }: JobDescriptionInputProps) => {
+export const JobDescriptionInput = ({ onSubmit, isLoading = false, disabled = false }: JobDescriptionInputProps) => {
   const [jobDescription, setJobDescription] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -80,7 +81,7 @@ We offer competitive salary, health benefits, and flexible work arrangements.`;
 
 Include key requirements, preferred skills, qualifications, and any specific technologies or frameworks mentioned in the job posting."
             className="min-h-[300px] resize-none bg-background/50 border-border/50 focus:border-primary/50 transition-all duration-300"
-            disabled={isLoading}
+            disabled={disabled || isLoading}
           />
           <div className="flex justify-between items-center text-xs text-muted-foreground">
             <span>{jobDescription.length} characters</span>
@@ -90,7 +91,7 @@ Include key requirements, preferred skills, qualifications, and any specific tec
 
         <Button
           type="submit"
-          disabled={!jobDescription.trim() || jobDescription.length < 50 || isLoading}
+          disabled={!jobDescription.trim() || jobDescription.length < 50 || isLoading || disabled}
           className="w-full"
           size="lg"
         >
