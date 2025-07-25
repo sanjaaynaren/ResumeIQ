@@ -5,7 +5,7 @@ import { JobDescriptionInput } from '@/components/JobDescriptionInput';
 import { AnalysisResults } from '@/components/AnalysisResults';
 import { ApiKeyInput } from '@/components/ApiKeyInput';
 import { useToast } from '@/hooks/use-toast';
-import { analyzeResumeWithAI, extractTextFromFile } from '@/lib/openai';
+import { analyzeResumeWithAI, extractTextFromFile } from '@/lib/gemini';
 
 interface AnalysisData {
   fitPercentage: number;
@@ -27,7 +27,7 @@ const Index = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    const savedApiKey = localStorage.getItem('openai_api_key');
+    const savedApiKey = localStorage.getItem('gemini_api_key');
     if (savedApiKey) {
       setApiKey(savedApiKey);
     }
@@ -167,7 +167,7 @@ const Index = () => {
     if (!apiKey) {
       toast({
         title: "API key required",
-        description: "Please configure your OpenAI API key first",
+        description: "Please configure your Gemini API key first",
         variant: "destructive",
       });
       return;

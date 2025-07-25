@@ -1,4 +1,4 @@
-import OpenAI from 'openai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export interface ResumeAnalysisResult {
   fitPercentage: number;
@@ -17,10 +17,8 @@ export const analyzeResumeWithAI = async (
   fileName: string,
   apiKey: string
 ): Promise<ResumeAnalysisResult> => {
-  const openai = new OpenAI({
-    apiKey: apiKey,
-    dangerouslyAllowBrowser: true
-  });
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
 
   const prompt = `
 Analyze the following resume against the job description and provide a detailed assessment.
@@ -53,31 +51,18 @@ Be objective and provide constructive feedback.
 `;
 
   try {
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4.1-2025-04-14',
-      messages: [
-        {
-          role: 'system',
-          content: 'You are an expert HR analyst and technical recruiter. Provide objective, detailed resume analysis with specific actionable insights.'
-        },
-        {
-          role: 'user',
-          content: prompt
-        }
-      ],
-      temperature: 0.3,
-      max_tokens: 2000
-    });
-
-    const content = response.choices[0]?.message?.content;
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const content = response.text();
+    
     if (!content) {
-      throw new Error('No response from OpenAI');
+      throw new Error('No response from Gemini');
     }
 
     // Extract JSON from response
     const jsonMatch = content.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
-      throw new Error('Invalid response format from OpenAI');
+      throw new Error('Invalid response format from Gemini');
     }
 
     const analysisData = JSON.parse(jsonMatch[0]);
@@ -87,7 +72,7 @@ Be objective and provide constructive feedback.
       fileName
     };
   } catch (error) {
-    console.error('OpenAI API Error:', error);
+    console.error('Gemini API Error:', error);
     throw new Error('Failed to analyze resume. Please check your API key and try again.');
   }
 };

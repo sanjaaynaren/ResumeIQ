@@ -17,13 +17,13 @@ export const ApiKeyInput = ({ onApiKeySet, hasApiKey }: ApiKeyInputProps) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (apiKey.trim()) {
-      localStorage.setItem('openai_api_key', apiKey.trim());
+      localStorage.setItem('gemini_api_key', apiKey.trim());
       onApiKeySet(apiKey.trim());
     }
   };
 
   const handleClearApiKey = () => {
-    localStorage.removeItem('openai_api_key');
+    localStorage.removeItem('gemini_api_key');
     setApiKey('');
     onApiKeySet('');
   };
@@ -35,7 +35,7 @@ export const ApiKeyInput = ({ onApiKeySet, hasApiKey }: ApiKeyInputProps) => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Key className="h-4 w-4 text-green-600" />
-              <span className="text-sm text-green-700">OpenAI API key configured</span>
+              <span className="text-sm text-green-700">Gemini API key configured</span>
             </div>
             <Button variant="outline" size="sm" onClick={handleClearApiKey}>
               Change Key
@@ -51,18 +51,18 @@ export const ApiKeyInput = ({ onApiKeySet, hasApiKey }: ApiKeyInputProps) => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Key className="h-5 w-5" />
-          Configure OpenAI API Key
+          Configure Gemini API Key
         </CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="apiKey">OpenAI API Key</Label>
+            <Label htmlFor="apiKey">Gemini API Key</Label>
             <div className="relative">
               <Input
                 id="apiKey"
                 type={showApiKey ? 'text' : 'password'}
-                placeholder="sk-..."
+                placeholder="AIza..."
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
                 className="pr-10"
@@ -86,12 +86,12 @@ export const ApiKeyInput = ({ onApiKeySet, hasApiKey }: ApiKeyInputProps) => {
             Your API key is stored locally in your browser and never sent to our servers.
             Get your API key from{' '}
             <a
-              href="https://platform.openai.com/api-keys"
+              href="https://ai.google.dev/"
               target="_blank"
               rel="noopener noreferrer"
               className="text-primary underline"
             >
-              OpenAI Platform
+              Google AI Studio
             </a>
           </div>
           <Button type="submit" disabled={!apiKey.trim()}>
