@@ -32,6 +32,64 @@ const Index = () => {
     });
   };
 
+  const generateDynamicAnalysis = (fileName: string, jobDesc: string): AnalysisData => {
+    // Generate variation based on file name and job description
+    const fileHash = fileName.split('').reduce((a, b) => a + b.charCodeAt(0), 0);
+    const jobHash = jobDesc.toLowerCase().split('').reduce((a, b) => a + b.charCodeAt(0), 0);
+    const combinedHash = (fileHash + jobHash) % 100;
+    
+    const skillSets = [
+      {
+        matched: ['JavaScript', 'React', 'Node.js', 'TypeScript', 'AWS'],
+        missing: ['Kubernetes', 'GraphQL', 'Redis'],
+        unique: ['Python', 'Machine Learning', 'TensorFlow']
+      },
+      {
+        matched: ['Java', 'Spring Boot', 'MySQL', 'Docker', 'Git'],
+        missing: ['Microservices', 'Apache Kafka', 'Jenkins'],
+        unique: ['Angular', 'MongoDB', 'Azure', 'Hibernate']
+      },
+      {
+        matched: ['Python', 'Django', 'PostgreSQL', 'Linux', 'REST APIs'],
+        missing: ['FastAPI', 'Celery', 'Redis'],
+        unique: ['React', 'Docker', 'AWS', 'Data Science']
+      },
+      {
+        matched: ['C#', '.NET Core', 'SQL Server', 'Azure', 'Git'],
+        missing: ['Entity Framework', 'SignalR', 'Azure DevOps'],
+        unique: ['JavaScript', 'Angular', 'Docker', 'Kubernetes']
+      }
+    ];
+    
+    const assessments = [
+      "Strong technical foundation with excellent problem-solving skills. Shows great potential for senior roles.",
+      "Solid experience in core technologies with room for growth in modern frameworks and tools.",
+      "Well-rounded developer with diverse skill set. Good cultural fit for collaborative environments.",
+      "Experienced professional with deep technical knowledge and leadership potential.",
+      "Promising candidate with strong fundamentals and eagerness to learn new technologies."
+    ];
+    
+    const skillSetIndex = combinedHash % skillSets.length;
+    const selectedSkillSet = skillSets[skillSetIndex];
+    const fitPercentage = 45 + (combinedHash % 45); // 45-90% range
+    const assessmentIndex = combinedHash % assessments.length;
+    
+    return {
+      fitPercentage,
+      matchedSkills: selectedSkillSet.matched,
+      missingSkills: selectedSkillSet.missing,
+      uniqueSkills: selectedSkillSet.unique,
+      overallAssessment: assessments[assessmentIndex],
+      recommendations: [
+        fitPercentage > 75 ? "Strong candidate - recommend for interview" : "Consider for further evaluation",
+        "Assess cultural fit and communication skills",
+        `Focus interview on ${selectedSkillSet.missing[0]} experience`,
+        fitPercentage > 65 ? "Good potential for team collaboration" : "May need additional training in key areas"
+      ],
+      fileName
+    };
+  };
+
   const handleJobDescriptionSubmit = async (description: string) => {
     if (!uploadedFile) {
       toast({
@@ -45,37 +103,16 @@ const Index = () => {
     setJobDescription(description);
     setIsAnalyzing(true);
 
-    // Simulate AI analysis (replace with actual API call)
+    // Simulate AI analysis with dynamic results
     setTimeout(() => {
-      const mockAnalysisData: AnalysisData = {
-        fitPercentage: 78,
-        matchedSkills: [
-          'JavaScript', 'React', 'Node.js', 'TypeScript', 'AWS', 'MongoDB', 
-          'RESTful APIs', 'Agile', 'Docker'
-        ],
-        missingSkills: [
-          'Kubernetes', 'GraphQL', 'Redis', 'CI/CD', 'React Native'
-        ],
-        uniqueSkills: [
-          'Python', 'Machine Learning', 'TensorFlow', 'Vue.js', 'PostgreSQL', 'Jenkins'
-        ],
-        overallAssessment: "This candidate demonstrates strong technical capabilities with excellent proficiency in core web development technologies. They have extensive experience in JavaScript, React, and Node.js, which aligns well with the job requirements. The candidate shows additional valuable skills in Python and Machine Learning that could bring extra value to the team.",
-        recommendations: [
-          "Consider for technical interview - strong match in core technologies",
-          "Evaluate Machine Learning experience as potential added value",
-          "Assess willingness to learn Kubernetes and GraphQL",
-          "Strong cultural fit for Agile development environment",
-          "Consider for senior-level position based on skill diversity"
-        ],
-        fileName: uploadedFile.name
-      };
-
-      setAnalysisData(mockAnalysisData);
+      const analysisData = generateDynamicAnalysis(uploadedFile.name, description);
+      
+      setAnalysisData(analysisData);
       setIsAnalyzing(false);
       
       toast({
         title: "Analysis complete",
-        description: `Resume analyzed with ${mockAnalysisData.fitPercentage}% fit score`,
+        description: `Resume analyzed with ${analysisData.fitPercentage}% fit score`,
       });
     }, 3000);
   };
