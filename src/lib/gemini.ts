@@ -18,7 +18,7 @@ export const analyzeResumeWithAI = async (
   apiKey: string
 ): Promise<ResumeAnalysisResult> => {
   const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
   const prompt = `
 Analyze the following resume against the job description and provide a detailed assessment.

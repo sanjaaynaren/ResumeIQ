@@ -26,6 +26,8 @@ export const ApiKeyInput = ({ onApiKeySet, hasApiKey }: ApiKeyInputProps) => {
     localStorage.removeItem('gemini_api_key');
     setApiKey('');
     onApiKeySet('');
+    // Force page reload to clear any cached API calls
+    window.location.reload();
   };
 
   if (hasApiKey) {
