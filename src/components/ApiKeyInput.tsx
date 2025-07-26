@@ -32,14 +32,19 @@ export const ApiKeyInput = ({ onApiKeySet, hasApiKey }: ApiKeyInputProps) => {
 
   if (hasApiKey) {
     return (
-      <Card className="border-green-200 bg-green-50">
+      <Card className="border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950">
         <CardContent className="pt-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Key className="h-4 w-4 text-green-600" />
-              <span className="text-sm text-green-700">Gemini API key configured</span>
+              <span className="text-sm text-green-700 dark:text-green-300">Gemini API key configured</span>
             </div>
-            <Button variant="outline" size="sm" onClick={handleClearApiKey}>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleClearApiKey}
+              className="bg-white hover:bg-gray-50 border-green-300"
+            >
               Change Key
             </Button>
           </div>
