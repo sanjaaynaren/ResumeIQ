@@ -71,8 +71,17 @@ Be objective and provide constructive feedback.
       ...analysisData,
       fileName
     };
-  } catch (error) {
+  } catch (error: any) {
     console.error('Gemini API Error:', error);
+    
+    if (error.status === 429) {
+      throw new Error('Gemini API quota exceeded. Please check your plan and billing details at https://ai.google.dev/');
+    }
+    
+    if (error.status === 403) {
+      throw new Error('Invalid API key. Please check your Gemini API key and try again.');
+    }
+    
     throw new Error('Failed to analyze resume. Please check your API key and try again.');
   }
 };

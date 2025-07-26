@@ -28,7 +28,8 @@ export const FileUpload = ({ onFileUpload, isLoading = false, disabled = false, 
         setUploadProgress(prev => {
           if (prev >= 100) {
             clearInterval(interval);
-            onFileUpload(file);
+            // Use setTimeout to avoid state update during render
+            setTimeout(() => onFileUpload(file), 0);
             return 100;
           }
           return prev + 10;
